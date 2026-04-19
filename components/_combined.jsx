@@ -1,0 +1,1703 @@
+
+// ===== frames/ios-frame.jsx =====
+
+// iOS.jsx — Simplified iOS 26 (Liquid Glass) device frame
+// Based on the iOS 26 UI Kit + Figma status bar spec. No assets, no deps.
+// Exports: IOSDevice, IOSStatusBar, IOSNavBar, IOSGlassPill, IOSList, IOSListRow, IOSKeyboard
+
+// ─────────────────────────────────────────────────────────────
+// Status bar
+// ─────────────────────────────────────────────────────────────
+function IOSStatusBar({ dark = false, time = '9:41' }) {
+  const c = dark ? '#fff' : '#000';
+  return (
+    <div style={{
+      display: 'flex', gap: 154, alignItems: 'center', justifyContent: 'center',
+      padding: '21px 24px 19px', boxSizing: 'border-box',
+      position: 'relative', zIndex: 20, width: '100%',
+    }}>
+      <div style={{ flex: 1, height: 22, display: 'flex', alignItems: 'center', justifyContent: 'center', paddingTop: 1.5 }}>
+        <span style={{
+          fontFamily: '-apple-system, "SF Pro", system-ui', fontWeight: 590,
+          fontSize: 17, lineHeight: '22px', color: c,
+        }}>{time}</span>
+      </div>
+      <div style={{ flex: 1, height: 22, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7, paddingTop: 1, paddingRight: 1 }}>
+        <svg width="19" height="12" viewBox="0 0 19 12">
+          <rect x="0" y="7.5" width="3.2" height="4.5" rx="0.7" fill={c}/>
+          <rect x="4.8" y="5" width="3.2" height="7" rx="0.7" fill={c}/>
+          <rect x="9.6" y="2.5" width="3.2" height="9.5" rx="0.7" fill={c}/>
+          <rect x="14.4" y="0" width="3.2" height="12" rx="0.7" fill={c}/>
+        </svg>
+        <svg width="17" height="12" viewBox="0 0 17 12">
+          <path d="M8.5 3.2C10.8 3.2 12.9 4.1 14.4 5.6L15.5 4.5C13.7 2.7 11.2 1.5 8.5 1.5C5.8 1.5 3.3 2.7 1.5 4.5L2.6 5.6C4.1 4.1 6.2 3.2 8.5 3.2Z" fill={c}/>
+          <path d="M8.5 6.8C9.9 6.8 11.1 7.3 12 8.2L13.1 7.1C11.8 5.9 10.2 5.1 8.5 5.1C6.8 5.1 5.2 5.9 3.9 7.1L5 8.2C5.9 7.3 7.1 6.8 8.5 6.8Z" fill={c}/>
+          <circle cx="8.5" cy="10.5" r="1.5" fill={c}/>
+        </svg>
+        <svg width="27" height="13" viewBox="0 0 27 13">
+          <rect x="0.5" y="0.5" width="23" height="12" rx="3.5" stroke={c} strokeOpacity="0.35" fill="none"/>
+          <rect x="2" y="2" width="20" height="9" rx="2" fill={c}/>
+          <path d="M25 4.5V8.5C25.8 8.2 26.5 7.2 26.5 6.5C26.5 5.8 25.8 4.8 25 4.5Z" fill={c} fillOpacity="0.4"/>
+        </svg>
+      </div>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+// Liquid glass pill — blur + tint + shine
+// ─────────────────────────────────────────────────────────────
+function IOSGlassPill({ children, dark = false, style = {} }) {
+  return (
+    <div style={{
+      height: 44, minWidth: 44, borderRadius: 9999,
+      position: 'relative', overflow: 'hidden',
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      boxShadow: dark
+        ? '0 2px 6px rgba(0,0,0,0.35), 0 6px 16px rgba(0,0,0,0.2)'
+        : '0 1px 3px rgba(0,0,0,0.07), 0 3px 10px rgba(0,0,0,0.06)',
+      ...style,
+    }}>
+      {/* blur + tint */}
+      <div style={{
+        position: 'absolute', inset: 0, borderRadius: 9999,
+        backdropFilter: 'blur(12px) saturate(180%)',
+        WebkitBackdropFilter: 'blur(12px) saturate(180%)',
+        background: dark ? 'rgba(120,120,128,0.28)' : 'rgba(255,255,255,0.5)',
+      }} />
+      {/* shine */}
+      <div style={{
+        position: 'absolute', inset: 0, borderRadius: 9999,
+        boxShadow: dark
+          ? 'inset 1.5px 1.5px 1px rgba(255,255,255,0.15), inset -1px -1px 1px rgba(255,255,255,0.08)'
+          : 'inset 1.5px 1.5px 1px rgba(255,255,255,0.7), inset -1px -1px 1px rgba(255,255,255,0.4)',
+        border: dark ? '0.5px solid rgba(255,255,255,0.15)' : '0.5px solid rgba(0,0,0,0.06)',
+      }} />
+      <div style={{ position: 'relative', zIndex: 1, display: 'flex', alignItems: 'center', padding: '0 4px' }}>
+        {children}
+      </div>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+// Navigation bar — glass pills + large title
+// ─────────────────────────────────────────────────────────────
+function IOSNavBar({ title = 'Title', dark = false, trailingIcon = true }) {
+  const muted = dark ? 'rgba(255,255,255,0.6)' : '#404040';
+  const text = dark ? '#fff' : '#000';
+  const pillIcon = (content) => (
+    <IOSGlassPill dark={dark}>
+      <div style={{ width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        {content}
+      </div>
+    </IOSGlassPill>
+  );
+  return (
+    <div style={{
+      display: 'flex', flexDirection: 'column', gap: 10,
+      paddingTop: 62, paddingBottom: 10, position: 'relative', zIndex: 5,
+    }}>
+      <div style={{
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        padding: '0 16px',
+      }}>
+        {/* back chevron */}
+        {pillIcon(
+          <svg width="12" height="20" viewBox="0 0 12 20" fill="none" style={{ marginLeft: -1 }}>
+            <path d="M10 2L2 10l8 8" stroke={muted} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        )}
+        {/* trailing ellipsis */}
+        {trailingIcon && pillIcon(
+          <svg width="22" height="6" viewBox="0 0 22 6">
+            <circle cx="3" cy="3" r="2.5" fill={muted}/>
+            <circle cx="11" cy="3" r="2.5" fill={muted}/>
+            <circle cx="19" cy="3" r="2.5" fill={muted}/>
+          </svg>
+        )}
+      </div>
+      {/* large title */}
+      <div style={{
+        padding: '0 16px',
+        fontFamily: '-apple-system, system-ui',
+        fontSize: 34, fontWeight: 700, lineHeight: '41px',
+        color: text, letterSpacing: 0.4,
+      }}>{title}</div>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+// Grouped list (inset card, r:26) + row (52px)
+// ─────────────────────────────────────────────────────────────
+function IOSListRow({ title, detail, icon, chevron = true, isLast = false, dark = false }) {
+  const text = dark ? '#fff' : '#000';
+  const sec = dark ? 'rgba(235,235,245,0.6)' : 'rgba(60,60,67,0.6)';
+  const ter = dark ? 'rgba(235,235,245,0.3)' : 'rgba(60,60,67,0.3)';
+  const sep = dark ? 'rgba(84,84,88,0.65)' : 'rgba(60,60,67,0.12)';
+  return (
+    <div style={{
+      display: 'flex', alignItems: 'center', minHeight: 52,
+      padding: '0 16px', position: 'relative',
+      fontFamily: '-apple-system, system-ui', fontSize: 17,
+      letterSpacing: -0.43,
+    }}>
+      {icon && (
+        <div style={{
+          width: 30, height: 30, borderRadius: 7, background: icon,
+          marginRight: 12, flexShrink: 0,
+        }} />
+      )}
+      <div style={{ flex: 1, color: text }}>{title}</div>
+      {detail && <span style={{ color: sec, marginRight: 6 }}>{detail}</span>}
+      {chevron && (
+        <svg width="8" height="14" viewBox="0 0 8 14" style={{ flexShrink: 0 }}>
+          <path d="M1 1l6 6-6 6" stroke={ter} strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+      )}
+      {!isLast && (
+        <div style={{
+          position: 'absolute', bottom: 0, right: 0,
+          left: icon ? 58 : 16, height: 0.5, background: sep,
+        }} />
+      )}
+    </div>
+  );
+}
+
+function IOSList({ header, children, dark = false }) {
+  const hc = dark ? 'rgba(235,235,245,0.6)' : 'rgba(60,60,67,0.6)';
+  const bg = dark ? '#1C1C1E' : '#fff';
+  return (
+    <div>
+      {header && (
+        <div style={{
+          fontFamily: '-apple-system, system-ui', fontSize: 13,
+          color: hc, textTransform: 'uppercase',
+          padding: '8px 36px 6px', letterSpacing: -0.08,
+        }}>{header}</div>
+      )}
+      <div style={{
+        background: bg, borderRadius: 26,
+        margin: '0 16px', overflow: 'hidden',
+      }}>{children}</div>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+// Device frame
+// ─────────────────────────────────────────────────────────────
+function IOSDevice({
+  children, width = 402, height = 874, dark = false,
+  title, keyboard = false,
+}) {
+  return (
+    <div style={{
+      width, height, borderRadius: 48, overflow: 'hidden',
+      position: 'relative', background: dark ? '#000' : '#F2F2F7',
+      boxShadow: '0 40px 80px rgba(0,0,0,0.18), 0 0 0 1px rgba(0,0,0,0.12)',
+      fontFamily: '-apple-system, system-ui, sans-serif',
+      WebkitFontSmoothing: 'antialiased',
+    }}>
+      {/* dynamic island */}
+      <div style={{
+        position: 'absolute', top: 11, left: '50%', transform: 'translateX(-50%)',
+        width: 126, height: 37, borderRadius: 24, background: '#000', zIndex: 50,
+      }} />
+      {/* status bar (absolute) */}
+      <div style={{ position: 'absolute', top: 0, left: 0, right: 0, zIndex: 10 }}>
+        <IOSStatusBar dark={dark} />
+      </div>
+      {/* nav + content */}
+      <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+        {title !== undefined && <IOSNavBar title={title} dark={dark} />}
+        <div style={{ flex: 1, overflow: 'auto' }}>{children}</div>
+        {keyboard && <IOSKeyboard dark={dark} />}
+      </div>
+      {/* home indicator — always on top */}
+      <div style={{
+        position: 'absolute', bottom: 0, left: 0, right: 0, zIndex: 60,
+        height: 34, display: 'flex', justifyContent: 'center', alignItems: 'flex-end',
+        paddingBottom: 8, pointerEvents: 'none',
+      }}>
+        <div style={{
+          width: 139, height: 5, borderRadius: 100,
+          background: dark ? 'rgba(255,255,255,0.7)' : 'rgba(0,0,0,0.25)',
+        }} />
+      </div>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+// Keyboard — iOS 26 liquid glass
+// ─────────────────────────────────────────────────────────────
+function IOSKeyboard({ dark = false }) {
+  const glyph = dark ? 'rgba(255,255,255,0.7)' : '#595959';
+  const sugg = dark ? 'rgba(255,255,255,0.6)' : '#333';
+  const keyBg = dark ? 'rgba(255,255,255,0.22)' : 'rgba(255,255,255,0.85)';
+
+  // special-key icons
+  const icons = {
+    shift: <svg width="19" height="17" viewBox="0 0 19 17"><path d="M9.5 1L1 9.5h4.5V16h8V9.5H18L9.5 1z" fill={glyph}/></svg>,
+    del: <svg width="23" height="17" viewBox="0 0 23 17"><path d="M7 1h13a2 2 0 012 2v11a2 2 0 01-2 2H7l-6-7.5L7 1z" fill="none" stroke={glyph} strokeWidth="1.6" strokeLinejoin="round"/><path d="M10 5l7 7M17 5l-7 7" stroke={glyph} strokeWidth="1.6" strokeLinecap="round"/></svg>,
+    ret: <svg width="20" height="14" viewBox="0 0 20 14"><path d="M18 1v6H4m0 0l4-4M4 7l4 4" fill="none" stroke="#fff" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>,
+  };
+
+  const key = (content, { w, flex, ret, fs = 25, k } = {}) => (
+    <div key={k} style={{
+      height: 42, borderRadius: 8.5,
+      flex: flex ? 1 : undefined, width: w, minWidth: 0,
+      background: ret ? '#08f' : keyBg,
+      boxShadow: '0 1px 0 rgba(0,0,0,0.075)',
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      fontFamily: '-apple-system, "SF Compact", system-ui',
+      fontSize: fs, fontWeight: 458, color: ret ? '#fff' : glyph,
+    }}>{content}</div>
+  );
+
+  const row = (keys, pad = 0) => (
+    <div style={{ display: 'flex', gap: 6.5, justifyContent: 'center', padding: `0 ${pad}px` }}>
+      {keys.map(l => key(l, { flex: true, k: l }))}
+    </div>
+  );
+
+  return (
+    <div style={{
+      position: 'relative', zIndex: 15, borderRadius: 27, overflow: 'hidden',
+      padding: '11px 0 2px',
+      display: 'flex', flexDirection: 'column', alignItems: 'center',
+      boxShadow: dark
+        ? '0 -2px 20px rgba(0,0,0,0.09)'
+        : '0 -1px 6px rgba(0,0,0,0.018), 0 -3px 20px rgba(0,0,0,0.012)',
+    }}>
+      {/* liquid glass bg — same recipe as nav pills */}
+      <div style={{
+        position: 'absolute', inset: 0, borderRadius: 27,
+        backdropFilter: 'blur(12px) saturate(180%)',
+        WebkitBackdropFilter: 'blur(12px) saturate(180%)',
+        background: dark ? 'rgba(120,120,128,0.14)' : 'rgba(255,255,255,0.25)',
+      }} />
+      <div style={{
+        position: 'absolute', inset: 0, borderRadius: 27,
+        boxShadow: dark
+          ? 'inset 1.5px 1.5px 1px rgba(255,255,255,0.15)'
+          : 'inset 1.5px 1.5px 1px rgba(255,255,255,0.7), inset -1px -1px 1px rgba(255,255,255,0.4)',
+        border: dark ? '0.5px solid rgba(255,255,255,0.15)' : '0.5px solid rgba(0,0,0,0.06)',
+        pointerEvents: 'none',
+      }} />
+
+      {/* autocorrect bar */}
+      <div style={{
+        display: 'flex', gap: 20, alignItems: 'center',
+        padding: '8px 22px 13px', width: '100%', boxSizing: 'border-box',
+        position: 'relative',
+      }}>
+        {['"The"', 'the', 'to'].map((w, i) => (
+          <React.Fragment key={i}>
+            {i > 0 && <div style={{ width: 1, height: 25, background: '#ccc', opacity: 0.3 }} />}
+            <div style={{
+              flex: 1, textAlign: 'center',
+              fontFamily: '-apple-system, system-ui', fontSize: 17,
+              color: sugg, letterSpacing: -0.43, lineHeight: '22px',
+            }}>{w}</div>
+          </React.Fragment>
+        ))}
+      </div>
+
+      {/* key layout */}
+      <div style={{
+        display: 'flex', flexDirection: 'column', gap: 13,
+        padding: '0 6.5px', width: '100%', boxSizing: 'border-box',
+        position: 'relative',
+      }}>
+        {row(['q','w','e','r','t','y','u','i','o','p'])}
+        {row(['a','s','d','f','g','h','j','k','l'], 20)}
+        <div style={{ display: 'flex', gap: 14.25, alignItems: 'center' }}>
+          {key(icons.shift, { w: 45, k: 'shift' })}
+          <div style={{ display: 'flex', gap: 6.5, flex: 1 }}>
+            {['z','x','c','v','b','n','m'].map(l => key(l, { flex: true, k: l }))}
+          </div>
+          {key(icons.del, { w: 45, k: 'del' })}
+        </div>
+        <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+          {key('ABC', { w: 92.25, fs: 18, k: 'abc' })}
+          {key('', { flex: true, k: 'space' })}
+          {key(icons.ret, { w: 92.25, ret: true, k: 'ret' })}
+        </div>
+      </div>
+
+      {/* bottom spacer (emoji+mic area, icons omitted) */}
+      <div style={{ height: 56, width: '100%', position: 'relative' }} />
+    </div>
+  );
+}
+
+Object.assign(window, {
+  IOSDevice, IOSStatusBar, IOSNavBar, IOSGlassPill, IOSList, IOSListRow, IOSKeyboard,
+});
+
+
+// ===== components/tokens.jsx =====
+// Design tokens for SSKIA SmartLounge
+const TOKENS = {
+  navy: '#0B1B2B',
+  navyDeep: '#071320',
+  navySoft: '#1A2A3D',
+  gold: '#C9A55C',
+  goldSoft: '#E6C98A',
+  goldDim: '#8A6F3A',
+  ivory: '#F7F3EC',
+  parchment: '#EEE6D6',
+  line: 'rgba(11,27,43,0.12)',
+  lineGold: 'rgba(201,165,92,0.35)',
+  ink: '#0A0A0A',
+  inkSoft: '#3D4550',
+  inkMuted: '#6B7280',
+  surface: '#FFFFFF',
+  success: '#2F6B4F',
+  serif: '"Cormorant Garamond", "Playfair Display", Georgia, serif',
+  sans: '"Inter", -apple-system, system-ui, sans-serif',
+  mono: '"JetBrains Mono", ui-monospace, monospace',
+};
+window.TOKENS = TOKENS;
+
+// Shared tiny icons (stroke-based, minimal)
+const Icon = {
+  chevronR: (c = '#6B7280', s = 14) => (
+    <svg width={s} height={s} viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke={c} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+  ),
+  chevronL: (c = '#6B7280', s = 14) => (
+    <svg width={s} height={s} viewBox="0 0 24 24" fill="none"><path d="M15 6l-6 6 6 6" stroke={c} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+  ),
+  calendar: (c) => (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><rect x="3.5" y="5" width="17" height="15.5" rx="2" stroke={c} strokeWidth="1.4"/><path d="M3.5 9.5h17M8 3v4M16 3v4" stroke={c} strokeWidth="1.4" strokeLinecap="round"/></svg>
+  ),
+  clock: (c) => (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke={c} strokeWidth="1.4"/><path d="M12 7v5l3 2" stroke={c} strokeWidth="1.4" strokeLinecap="round"/></svg>
+  ),
+  video: (c) => (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="2.5" y="6.5" width="13" height="11" rx="2" stroke={c} strokeWidth="1.4"/><path d="M15.5 10.5l6-3v9l-6-3v-3z" stroke={c} strokeWidth="1.4" strokeLinejoin="round"/></svg>
+  ),
+  lounge: (c) => (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M4 14v5M20 14v5M4 14h16M4 14v-3a3 3 0 013-3h10a3 3 0 013 3v3M8 8V6a2 2 0 012-2h4a2 2 0 012 2v2" stroke={c} strokeWidth="1.4" strokeLinecap="round"/></svg>
+  ),
+  concierge: (c) => (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M5 19h14M6 19v-3a6 6 0 0112 0v3M12 7V4M10 4h4" stroke={c} strokeWidth="1.4" strokeLinecap="round"/></svg>
+  ),
+  insight: (c) => (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M4 19V5M4 19h16M7 15l4-5 3 3 5-7" stroke={c} strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/></svg>
+  ),
+  account: (c) => (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M3 10h18M5 6h14a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2z" stroke={c} strokeWidth="1.4"/><path d="M7 15h4" stroke={c} strokeWidth="1.4" strokeLinecap="round"/></svg>
+  ),
+  rm: (c) => (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="3.5" stroke={c} strokeWidth="1.4"/><path d="M5 20c0-3.5 3.1-6 7-6s7 2.5 7 6" stroke={c} strokeWidth="1.4" strokeLinecap="round"/></svg>
+  ),
+  home: (c) => (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M4 11l8-7 8 7v8a1 1 0 01-1 1h-4v-6h-6v6H5a1 1 0 01-1-1v-8z" stroke={c} strokeWidth="1.4" strokeLinejoin="round"/></svg>
+  ),
+  bell: (c) => (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M6 9a6 6 0 1112 0v4l2 3H4l2-3V9zM10 19a2 2 0 004 0" stroke={c} strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/></svg>
+  ),
+  check: (c, s=16) => (
+    <svg width={s} height={s} viewBox="0 0 24 24" fill="none"><path d="M5 12l5 5 9-10" stroke={c} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+  ),
+  plane: (c) => (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M21 12l-7-1L10 4 8 5l2 7-5 1-2-1-1 1 3 3 3 3 1-1-1-2 1-5 7 2 1-2-4-4 1-1 6 1z" fill={c}/></svg>
+  ),
+  qr: (c, s=18) => (
+    <svg width={s} height={s} viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="7" height="7" stroke={c} strokeWidth="1.4"/><rect x="14" y="3" width="7" height="7" stroke={c} strokeWidth="1.4"/><rect x="3" y="14" width="7" height="7" stroke={c} strokeWidth="1.4"/><rect x="6" y="6" width="1" height="1" fill={c}/><rect x="17" y="6" width="1" height="1" fill={c}/><rect x="6" y="17" width="1" height="1" fill={c}/><path d="M14 14h3v3h-3zM18 14h3M14 18v3M18 18h3v3" stroke={c} strokeWidth="1.4"/></svg>
+  ),
+  search: (c) => (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="6.5" stroke={c} strokeWidth="1.4"/><path d="M16 16l4 4" stroke={c} strokeWidth="1.4" strokeLinecap="round"/></svg>
+  ),
+  spark: (c) => (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 3l2.2 6.8L21 12l-6.8 2.2L12 21l-2.2-6.8L3 12l6.8-2.2L12 3z" fill={c}/></svg>
+  ),
+  dot: (c) => <span style={{display:'inline-block', width:5, height:5, borderRadius:5, background:c, verticalAlign:'middle'}} />,
+  pin: (c) => (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 22s7-7 7-13a7 7 0 10-14 0c0 6 7 13 7 13z" stroke={c} strokeWidth="1.4"/><circle cx="12" cy="9" r="2.5" stroke={c} strokeWidth="1.4"/></svg>
+  ),
+};
+window.Icon = Icon;
+
+
+// ===== components/primitives.jsx =====
+// Shared primitives: Button, Pill, Avatar, PartnerMark, Divider, etc.
+
+function GoldDivider({ style={} }) {
+  return (
+    <div style={{
+      display:'flex', alignItems:'center', gap:10,
+      ...style,
+    }}>
+      <div style={{flex:1, height:1, background:'linear-gradient(to right, transparent, rgba(201,165,92,0.45), transparent)'}} />
+    </div>
+  );
+}
+window.GoldDivider = GoldDivider;
+
+function Button({ children, variant='primary', onClick, full, size='md', style={}, disabled }) {
+  const base = {
+    fontFamily: TOKENS.sans,
+    fontWeight: 500,
+    borderRadius: 999,
+    border: 'none',
+    cursor: disabled ? 'not-allowed' : 'pointer',
+    opacity: disabled ? 0.5 : 1,
+    display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap:8,
+    letterSpacing: 0.2,
+    transition: 'all 0.2s ease',
+    width: full ? '100%' : undefined,
+    fontSize: size==='sm' ? 13 : 14,
+    padding: size==='sm' ? '8px 16px' : '14px 22px',
+  };
+  const variants = {
+    primary: { background: TOKENS.navy, color: TOKENS.ivory },
+    gold:    { background: TOKENS.gold, color: TOKENS.navy },
+    outline: { background:'transparent', color: TOKENS.navy, boxShadow:`inset 0 0 0 1px ${TOKENS.navy}` },
+    ghost:   { background:'transparent', color: TOKENS.navy },
+    goldOutline: { background:'transparent', color: TOKENS.gold, boxShadow:`inset 0 0 0 1px ${TOKENS.gold}`},
+  };
+  return <button onClick={onClick} disabled={disabled} style={{...base, ...variants[variant], ...style}}>{children}</button>;
+}
+window.Button = Button;
+
+function Pill({ children, tone='navy', style={} }) {
+  const tones = {
+    navy: { background: 'rgba(11,27,43,0.06)', color: TOKENS.navy, border:`1px solid ${TOKENS.line}` },
+    gold: { background: 'rgba(201,165,92,0.1)', color: TOKENS.goldDim, border:`1px solid ${TOKENS.lineGold}` },
+    dark: { background: TOKENS.navy, color: TOKENS.goldSoft, border:'none' },
+    live: { background:'#0D2A1C', color:'#7FD8AE', border:'1px solid rgba(127,216,174,0.25)' },
+  };
+  return (
+    <span style={{
+      display:'inline-flex', alignItems:'center', gap:6,
+      fontFamily: TOKENS.sans, fontSize: 11, fontWeight: 500,
+      letterSpacing: 0.8, textTransform: 'uppercase',
+      padding:'4px 10px', borderRadius: 999,
+      ...tones[tone], ...style,
+    }}>{children}</span>
+  );
+}
+window.Pill = Pill;
+
+function Avatar({ name, size=44, tone='navy' }) {
+  const initials = name.split(' ').slice(0,2).map(n=>n[0]).join('');
+  const palette = {
+    navy: { bg: TOKENS.navy, fg: TOKENS.goldSoft },
+    gold: { bg: TOKENS.parchment, fg: TOKENS.navy },
+    ivory: { bg: TOKENS.ivory, fg: TOKENS.navy },
+  };
+  const p = palette[tone];
+  return (
+    <div style={{
+      width:size, height:size, borderRadius:size,
+      background: p.bg, color: p.fg,
+      display:'flex', alignItems:'center', justifyContent:'center',
+      fontFamily: TOKENS.serif, fontWeight: 500, fontSize: size*0.38,
+      letterSpacing: 0.5, flexShrink:0,
+      boxShadow: `inset 0 0 0 1px ${TOKENS.lineGold}`,
+    }}>{initials}</div>
+  );
+}
+window.Avatar = Avatar;
+
+// SSKIA mark — a simple, original monogram inside a ring. No branded copies.
+function SskiaMark({ size=28, color=TOKENS.gold }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 40 40">
+      <circle cx="20" cy="20" r="18.5" fill="none" stroke={color} strokeWidth="1"/>
+      <circle cx="20" cy="20" r="14.5" fill="none" stroke={color} strokeWidth="0.5" opacity="0.5"/>
+      <text x="20" y="25" textAnchor="middle" fontFamily='"Cormorant Garamond", serif' fontSize="15" fontWeight="500" fill={color} letterSpacing="1">S</text>
+    </svg>
+  );
+}
+window.SskiaMark = SskiaMark;
+
+function PartnerMark({ variant='light' }) {
+  // Shows "In partnership with" + uploaded logo as a small chip — clearly positioned as partner, not primary brand
+  const c = variant==='light' ? 'rgba(247,243,236,0.55)' : 'rgba(11,27,43,0.55)';
+  return (
+    <div style={{display:'flex', alignItems:'center', gap:8}}>
+      <span style={{
+        fontFamily: TOKENS.sans, fontSize: 9, letterSpacing: 1.2,
+        textTransform: 'uppercase', color: c,
+      }}>Banking partner</span>
+      <img src="assets/partner-logo.png" alt="Partner bank" style={{height:18, width:18, borderRadius:9}}/>
+    </div>
+  );
+}
+window.PartnerMark = PartnerMark;
+
+// Hairline card
+function Card({ children, style={}, padding=18, onClick }) {
+  return (
+    <div onClick={onClick} style={{
+      background: TOKENS.surface,
+      border: `1px solid ${TOKENS.line}`,
+      borderRadius: 14,
+      padding,
+      cursor: onClick ? 'pointer' : 'default',
+      ...style,
+    }}>{children}</div>
+  );
+}
+window.Card = Card;
+
+// Subtly striped placeholder for imagery
+function ImagePlaceholder({ label, height=120, tone='navy', style={} }) {
+  const bg = tone==='navy'
+    ? `repeating-linear-gradient(135deg, ${TOKENS.navy} 0px, ${TOKENS.navy} 10px, ${TOKENS.navyDeep} 10px, ${TOKENS.navyDeep} 20px)`
+    : `repeating-linear-gradient(135deg, ${TOKENS.parchment} 0px, ${TOKENS.parchment} 10px, ${TOKENS.ivory} 10px, ${TOKENS.ivory} 20px)`;
+  const color = tone==='navy' ? TOKENS.goldSoft : TOKENS.navy;
+  return (
+    <div style={{
+      height, width:'100%', borderRadius:10, background: bg,
+      display:'flex', alignItems:'center', justifyContent:'center',
+      fontFamily: TOKENS.mono, fontSize: 10, letterSpacing: 1,
+      textTransform:'uppercase', color, opacity:0.9,
+      border:`1px solid ${TOKENS.lineGold}`,
+      ...style,
+    }}>{label}</div>
+  );
+}
+window.ImagePlaceholder = ImagePlaceholder;
+
+
+// ===== components/data.jsx =====
+// Data: investor personas, RMs, specializations, time slots
+const PERSONAS = {
+  investor: {
+    id: 'investor',
+    name: 'Aarav Mehta',
+    title: 'Managing Partner, Horizon Capital',
+    segment: 'High-Net-Worth Investor',
+    flight: { no: 'QR1377', from: 'DOH', to: 'GBE', gate: 'A4', eta: '14:22 local' },
+    interests: ['ESG', 'Mining', 'Private Equity'],
+    portfolio: '$48M AUM',
+  },
+  corporate: {
+    id: 'corporate',
+    name: 'Lerato Dube',
+    title: 'CFO, Kalahari Minerals Group',
+    segment: 'Corporate Client',
+    flight: { no: 'SA078', from: 'JNB', to: 'GBE', gate: 'A2', eta: '15:10 local' },
+    interests: ['Treasury', 'FX Hedging', 'Trade Finance'],
+    portfolio: 'Corporate banking',
+  },
+};
+
+const SPECIALIZATIONS = [
+  { id:'wealth', label:'Wealth & Private', desc:'Portfolios above $1M USD', icon:'◆' },
+  { id:'esg',    label:'ESG & Sustainable', desc:'Green bonds, impact investing', icon:'❖' },
+  { id:'mining', label:'Mining & Resources', desc:'Sector-specialist coverage', icon:'◈' },
+  { id:'tourism',label:'Tourism & Hospitality', desc:'Sector financing & FX', icon:'◇' },
+  { id:'corp',   label:'Corporate & Treasury', desc:'Cash management, trade finance', icon:'▣' },
+  { id:'sme',    label:'SME & Growth', desc:'Expansion capital, advisory', icon:'▢' },
+];
+
+const RMS = [
+  {
+    id:'rm1',
+    name:'Thato Molefe',
+    title:'Senior Relationship Manager — Wealth & ESG',
+    specs:['wealth','esg','mining'],
+    portfolio:'$680M AUM',
+    years: 14,
+    languages:['English','Setswana','French'],
+    location:'Private Banking Floor, Airport Junction',
+    nextSlot:'Today · 15:20',
+    bio:'Leads ESG and sustainable-finance advisory for HNW clients across Southern Africa. Former lead on the Okavango Green Bond issuance.',
+    rating: 4.9,
+    reviews: 87,
+  },
+  {
+    id:'rm2',
+    name:'Kgosi Ramotswe',
+    title:'Director, Mining & Resources Coverage',
+    specs:['mining','corp','esg'],
+    portfolio:'$1.2B book',
+    years: 18,
+    languages:['English','Setswana','Mandarin'],
+    location:'Corporate Centre, Fairgrounds',
+    nextSlot:'Today · 16:00',
+    bio:'18 years structuring mining finance across Botswana, Zambia and DRC. Advisory to three of the top five diamond operators.',
+    rating: 4.8,
+    reviews: 112,
+  },
+  {
+    id:'rm3',
+    name:'Naledi Setlhare',
+    title:'Relationship Manager — Tourism & SME',
+    specs:['tourism','sme','corp'],
+    portfolio:'$310M book',
+    years: 9,
+    languages:['English','Setswana','Portuguese'],
+    location:'SSKIA Airport Branch',
+    nextSlot:'Today · 14:45',
+    bio:'Focused on tourism operators, safari concessions and hospitality expansion financing across the Okavango delta region.',
+    rating: 4.9,
+    reviews: 64,
+  },
+  {
+    id:'rm4',
+    name:'Dikeledi Phiri',
+    title:'Head of Private Banking — Gaborone',
+    specs:['wealth','esg','corp'],
+    portfolio:'$2.4B AUM',
+    years: 22,
+    languages:['English','Setswana','Shona'],
+    location:'Private Banking Floor, Airport Junction',
+    nextSlot:'Tomorrow · 09:00',
+    bio:'Heads the private banking division in Botswana. Sits on the ESG investment committee.',
+    rating: 5.0,
+    reviews: 48,
+  },
+];
+
+const MEETING_TYPES = [
+  { id:'lounge', label:'In the Lounge', desc:'RM comes to you at the SmartLounge', duration:'30 min', note:'Most convenient on arrival' },
+  { id:'video',  label:'Video Call',    desc:'Secure call from your lounge seat',  duration:'30 min', note:'Private booth provided' },
+  { id:'branch', label:'Branch Visit',  desc:'Chauffeured to Airport Junction branch', duration:'60 min', note:'Car arranged · 12 min away' },
+];
+
+const TIME_SLOTS = [
+  { time:'14:45', available:true, type:'Now' },
+  { time:'15:20', available:true, type:'+30 min' },
+  { time:'16:00', available:true, type:'+1 hr' },
+  { time:'16:45', available:false, type:'Booked' },
+  { time:'17:30', available:true, type:'Today' },
+  { time:'18:15', available:true, type:'Today' },
+];
+
+const DATES = [
+  { d:'18', day:'Today', dow:'Sat', active:true, avail:4 },
+  { d:'19', day:'Sun',   dow:'Sun', active:false, avail:6 },
+  { d:'20', day:'Mon',   dow:'Mon', active:false, avail:8 },
+  { d:'21', day:'Tue',   dow:'Tue', active:false, avail:5 },
+  { d:'22', day:'Wed',   dow:'Wed', active:false, avail:7 },
+];
+
+window.PERSONAS = PERSONAS;
+window.SPECIALIZATIONS = SPECIALIZATIONS;
+window.RMS = RMS;
+window.MEETING_TYPES = MEETING_TYPES;
+window.TIME_SLOTS = TIME_SLOTS;
+window.DATES = DATES;
+
+
+// ===== components/arrival.jsx =====
+// Arrival screen: QR scan + personalized welcome
+function ArrivalScreen({ persona, onContinue }) {
+  const [stage, setStage] = React.useState(0); // 0: scan, 1: detecting, 2: welcome
+  React.useEffect(() => {
+    if (stage === 1) {
+      const t = setTimeout(() => setStage(2), 1400);
+      return () => clearTimeout(t);
+    }
+  }, [stage]);
+
+  if (stage < 2) {
+    return (
+      <div style={{
+        height:'100%', background: TOKENS.navyDeep, color: TOKENS.ivory,
+        display:'flex', flexDirection:'column', padding:'80px 28px 40px',
+        fontFamily: TOKENS.sans,
+        backgroundImage: `radial-gradient(ellipse at top, ${TOKENS.navySoft} 0%, ${TOKENS.navyDeep} 60%)`,
+      }}>
+        <div style={{display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:40}}>
+          <div style={{display:'flex', alignItems:'center', gap:8}}>
+            <SskiaMark size={22}/>
+            <span style={{fontFamily:TOKENS.serif, fontSize:17, letterSpacing:1.5, color:TOKENS.ivory}}>SSKIA</span>
+            <span style={{fontFamily:TOKENS.sans, fontSize:10, letterSpacing:2, color:TOKENS.gold}}>SMARTLOUNGE</span>
+          </div>
+        </div>
+
+        <div style={{flex:1, display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', textAlign:'center'}}>
+          <div style={{
+            width:200, height:200, borderRadius:18,
+            background: TOKENS.ivory, padding:18, position:'relative',
+            boxShadow:`0 0 60px rgba(201,165,92,0.25)`,
+          }}>
+            <svg viewBox="0 0 100 100" width="100%" height="100%">
+              {/* Stylized QR */}
+              {[...Array(13)].map((_,r)=>[...Array(13)].map((_,c)=>{
+                const v = ((r*c + r + c*3) % 5) > 2 || (r<3&&c<3) || (r<3&&c>9) || (r>9&&c<3);
+                if (!v) return null;
+                return <rect key={`${r}-${c}`} x={4+c*7} y={4+r*7} width="6" height="6" fill={TOKENS.navy}/>;
+              }))}
+              <rect x="4" y="4" width="20" height="20" fill="none" stroke={TOKENS.navy} strokeWidth="2"/>
+              <rect x="10" y="10" width="8" height="8" fill={TOKENS.gold}/>
+              <rect x="76" y="4" width="20" height="20" fill="none" stroke={TOKENS.navy} strokeWidth="2"/>
+              <rect x="82" y="10" width="8" height="8" fill={TOKENS.gold}/>
+              <rect x="4" y="76" width="20" height="20" fill="none" stroke={TOKENS.navy} strokeWidth="2"/>
+              <rect x="10" y="82" width="8" height="8" fill={TOKENS.gold}/>
+            </svg>
+            {stage===1 && <div style={{
+              position:'absolute', inset:18, border:`2px solid ${TOKENS.gold}`,
+              animation:'scanPulse 1.4s ease-in-out infinite',
+            }}/>}
+          </div>
+
+          <div style={{marginTop:36, fontFamily:TOKENS.serif, fontSize:34, lineHeight:1.15, letterSpacing:0.3}}>
+            {stage===0 ? 'Welcome to Botswana' : 'Verifying your arrival…'}
+          </div>
+          <div style={{marginTop:14, fontSize:13, color:'rgba(247,243,236,0.65)', letterSpacing:0.3, lineHeight:1.6, maxWidth:280}}>
+            {stage===0
+              ? 'Scan the code at the SmartLounge entrance to unlock personalised concierge and banking services.'
+              : 'Matching your itinerary and premier status…'}
+          </div>
+        </div>
+
+        {stage===0 && (
+          <div style={{display:'flex', flexDirection:'column', gap:12}}>
+            <Button variant="gold" full onClick={()=>setStage(1)}>
+              {Icon.qr(TOKENS.navy, 16)} Simulate QR scan
+            </Button>
+            <div style={{textAlign:'center', fontSize:11, color:'rgba(247,243,236,0.45)', letterSpacing:1.2, textTransform:'uppercase', marginTop:6}}>
+              Sir Seretse Khama International · Gaborone
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // Stage 2: personalized welcome
+  return (
+    <div style={{
+      height:'100%', background: TOKENS.navyDeep, color: TOKENS.ivory,
+      display:'flex', flexDirection:'column', padding:'70px 26px 32px',
+      fontFamily: TOKENS.sans,
+      backgroundImage: `radial-gradient(ellipse at top right, rgba(201,165,92,0.18) 0%, transparent 50%), radial-gradient(ellipse at bottom, ${TOKENS.navySoft} 0%, ${TOKENS.navyDeep} 60%)`,
+    }}>
+      <div style={{display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:28}}>
+        <div style={{display:'flex', alignItems:'center', gap:8}}>
+          <SskiaMark size={20}/>
+          <span style={{fontFamily:TOKENS.serif, fontSize:14, letterSpacing:1.5}}>SSKIA</span>
+          <span style={{fontSize:9, letterSpacing:2, color:TOKENS.gold}}>SMARTLOUNGE</span>
+        </div>
+        <PartnerMark variant="light"/>
+      </div>
+
+      <div style={{fontSize:11, letterSpacing:2, color:TOKENS.gold, textTransform:'uppercase'}}>Karibu · Welcome</div>
+      <div style={{fontFamily:TOKENS.serif, fontSize:40, lineHeight:1.1, marginTop:8, letterSpacing:0.2}}>
+        {persona.name.split(' ')[0]},<br/>
+        <span style={{fontStyle:'italic', color:TOKENS.goldSoft}}>your lounge is ready.</span>
+      </div>
+
+      <div style={{marginTop:30, padding:'18px 0', borderTop:`1px solid ${TOKENS.lineGold}`, borderBottom:`1px solid ${TOKENS.lineGold}`}}>
+        <div style={{display:'flex', justifyContent:'space-between', alignItems:'flex-start', gap:16}}>
+          <div>
+            <div style={{fontSize:10, letterSpacing:1.5, color:'rgba(247,243,236,0.5)', textTransform:'uppercase'}}>Flight</div>
+            <div style={{fontFamily:TOKENS.mono, fontSize:16, marginTop:4, color:TOKENS.ivory}}>{persona.flight.no}</div>
+            <div style={{fontFamily:TOKENS.mono, fontSize:11, color:TOKENS.goldSoft, marginTop:2}}>{persona.flight.from} → {persona.flight.to}</div>
+          </div>
+          <div>
+            <div style={{fontSize:10, letterSpacing:1.5, color:'rgba(247,243,236,0.5)', textTransform:'uppercase'}}>Arrival</div>
+            <div style={{fontFamily:TOKENS.mono, fontSize:16, marginTop:4}}>{persona.flight.eta}</div>
+            <div style={{fontFamily:TOKENS.mono, fontSize:11, color:TOKENS.goldSoft, marginTop:2}}>Gate {persona.flight.gate}</div>
+          </div>
+          <div>
+            <div style={{fontSize:10, letterSpacing:1.5, color:'rgba(247,243,236,0.5)', textTransform:'uppercase'}}>Status</div>
+            <div style={{fontSize:13, marginTop:4, color:TOKENS.goldSoft, fontFamily:TOKENS.serif, fontStyle:'italic'}}>Premier</div>
+            <div style={{fontSize:10, color:'rgba(247,243,236,0.5)', marginTop:2}}>Tier 1</div>
+          </div>
+        </div>
+      </div>
+
+      <div style={{marginTop:22, fontSize:13, lineHeight:1.6, color:'rgba(247,243,236,0.75)'}}>
+        Based on your itinerary and portfolio profile, we've prepared a discreet <span style={{color:TOKENS.goldSoft}}>Relationship Manager introduction</span> and a selection of lounge amenities.
+      </div>
+
+      <div style={{flex:1}}/>
+
+      <div style={{display:'flex', flexDirection:'column', gap:10, marginTop:20}}>
+        <Button variant="gold" full onClick={onContinue}>Enter SmartLounge →</Button>
+      </div>
+    </div>
+  );
+}
+window.ArrivalScreen = ArrivalScreen;
+
+
+// ===== components/home.jsx =====
+// Home / service menu — "SmartLounge" main screen
+function HomeScreen({ persona, onNav, onOpenRM }) {
+  const services = [
+    { id:'rm',       label:'Book your RM',      sub:'Relationship Manager · Priority', icon: Icon.rm,        featured:true },
+    { id:'lounge',   label:'Lounge Services',   sub:'Dining · Showers · Rest',         icon: Icon.lounge },
+    { id:'concierge',label:'Concierge',         sub:'Hotel · Transfers · Translator',  icon: Icon.concierge },
+    { id:'insights', label:'Market Briefings',  sub:'Botswana investor insights',      icon: Icon.insight },
+    { id:'account',  label:'Open an Account',   sub:'Digital onboarding · 8 minutes',  icon: Icon.account },
+  ];
+
+  return (
+    <div style={{height:'100%', background: TOKENS.ivory, fontFamily:TOKENS.sans, overflow:'auto'}}>
+      {/* Header banner */}
+      <div style={{
+        background: TOKENS.navyDeep, color:TOKENS.ivory,
+        padding:'64px 24px 28px',
+        backgroundImage: `radial-gradient(ellipse at top right, rgba(201,165,92,0.16) 0%, transparent 55%)`,
+        position:'relative',
+      }}>
+        <div style={{display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:24}}>
+          <div style={{display:'flex', alignItems:'center', gap:8}}>
+            <SskiaMark size={20}/>
+            <div>
+              <div style={{fontFamily:TOKENS.serif, fontSize:13, letterSpacing:1.5, lineHeight:1}}>SSKIA</div>
+              <div style={{fontSize:8, letterSpacing:2, color:TOKENS.gold, marginTop:2}}>SMARTLOUNGE</div>
+            </div>
+          </div>
+          <div style={{display:'flex', alignItems:'center', gap:14}}>
+            {Icon.bell('rgba(247,243,236,0.8)')}
+            <Avatar name={persona.name} size={34}/>
+          </div>
+        </div>
+
+        <div style={{fontSize:10, letterSpacing:2, color:TOKENS.gold, textTransform:'uppercase'}}>Good afternoon</div>
+        <div style={{fontFamily:TOKENS.serif, fontSize:30, lineHeight:1.15, marginTop:6, letterSpacing:0.3}}>
+          {persona.name.split(' ')[0]}
+        </div>
+        <div style={{fontSize:12, color:'rgba(247,243,236,0.6)', marginTop:6, fontStyle:'italic', fontFamily:TOKENS.serif}}>
+          {persona.title}
+        </div>
+
+        {/* Arrival chip */}
+        <div style={{
+          marginTop:20, padding:'10px 14px',
+          borderRadius:10, border:`1px solid ${TOKENS.lineGold}`,
+          background:'rgba(201,165,92,0.07)',
+          display:'flex', alignItems:'center', gap:12,
+        }}>
+          <div style={{
+            width:32, height:32, borderRadius:6,
+            background:'rgba(201,165,92,0.15)',
+            display:'flex', alignItems:'center', justifyContent:'center',
+          }}>{Icon.plane(TOKENS.goldSoft)}</div>
+          <div style={{flex:1}}>
+            <div style={{fontFamily:TOKENS.mono, fontSize:11, color:TOKENS.goldSoft}}>
+              {persona.flight.no} · {persona.flight.from} → {persona.flight.to}
+            </div>
+            <div style={{fontSize:11, color:'rgba(247,243,236,0.6)', marginTop:2}}>
+              Arrived {persona.flight.eta} · Lounge A, Level 2
+            </div>
+          </div>
+          <Pill tone="live">
+            <Icon.dot c="#7FD8AE"/> Premier
+          </Pill>
+        </div>
+      </div>
+
+      {/* Featured RM booking CTA */}
+      <div style={{padding:'22px 20px 0'}}>
+        <div style={{
+          background:`linear-gradient(135deg, ${TOKENS.navy} 0%, ${TOKENS.navySoft} 100%)`,
+          color: TOKENS.ivory, borderRadius:18, padding:22,
+          position:'relative', overflow:'hidden',
+          border:`1px solid ${TOKENS.lineGold}`,
+          cursor:'pointer',
+        }} onClick={()=>onNav('rm')}>
+          <div style={{position:'absolute', top:-30, right:-30, width:140, height:140, borderRadius:140, background:'radial-gradient(circle, rgba(201,165,92,0.2) 0%, transparent 70%)'}}/>
+          <Pill tone="gold" style={{background:'rgba(201,165,92,0.18)', color:TOKENS.goldSoft, border:'none'}}>
+            {Icon.spark(TOKENS.gold)} Recommended for you
+          </Pill>
+          <div style={{fontFamily:TOKENS.serif, fontSize:26, lineHeight:1.15, marginTop:12, letterSpacing:0.2}}>
+            Meet your <span style={{fontStyle:'italic', color:TOKENS.goldSoft}}>Relationship Manager</span>
+          </div>
+          <div style={{fontSize:12, color:'rgba(247,243,236,0.7)', marginTop:8, lineHeight:1.5}}>
+            We've matched you with specialists in ESG, mining and wealth. Next available slot today at 14:45.
+          </div>
+          <div style={{display:'flex', alignItems:'center', gap:-8, marginTop:16, position:'relative'}}>
+            <div style={{display:'flex'}}>
+              {RMS.slice(0,3).map((r,i)=>(
+                <div key={r.id} style={{marginLeft: i===0?0:-10, boxShadow:`0 0 0 2px ${TOKENS.navy}`, borderRadius:999}}>
+                  <Avatar name={r.name} size={30} tone={i%2===0?'gold':'ivory'}/>
+                </div>
+              ))}
+            </div>
+            <div style={{flex:1, marginLeft:12, fontSize:11, color:'rgba(247,243,236,0.6)'}}>
+              {RMS.length} RMs available
+            </div>
+            <Button variant="gold" size="sm">Book now →</Button>
+          </div>
+        </div>
+      </div>
+
+      {/* Service grid */}
+      <div style={{padding:'26px 20px 20px'}}>
+        <div style={{display:'flex', alignItems:'baseline', justifyContent:'space-between', marginBottom:14}}>
+          <div style={{fontFamily:TOKENS.serif, fontSize:18, letterSpacing:0.2}}>Lounge services</div>
+          <div style={{fontSize:10, letterSpacing:1.5, color:TOKENS.inkMuted, textTransform:'uppercase'}}>All available</div>
+        </div>
+
+        <div style={{display:'flex', flexDirection:'column', gap:10}}>
+          {services.filter(s=>s.id!=='rm').map(s => (
+            <Card key={s.id} onClick={()=>onNav(s.id)} padding={16} style={{display:'flex', alignItems:'center', gap:14}}>
+              <div style={{
+                width:42, height:42, borderRadius:10,
+                background: TOKENS.parchment,
+                display:'flex', alignItems:'center', justifyContent:'center',
+                flexShrink:0,
+              }}>{s.icon(TOKENS.navy)}</div>
+              <div style={{flex:1}}>
+                <div style={{fontSize:14, color:TOKENS.navy, fontWeight:500}}>{s.label}</div>
+                <div style={{fontSize:11, color:TOKENS.inkMuted, marginTop:2}}>{s.sub}</div>
+              </div>
+              {Icon.chevronR(TOKENS.inkMuted)}
+            </Card>
+          ))}
+        </div>
+      </div>
+
+      {/* Partner mark footer */}
+      <div style={{padding:'16px 20px 32px', display:'flex', alignItems:'center', justifyContent:'center', gap:10, borderTop:`1px solid ${TOKENS.line}`, margin:'20px 20px 0'}}>
+        <PartnerMark variant="dark"/>
+      </div>
+    </div>
+  );
+}
+window.HomeScreen = HomeScreen;
+
+
+// ===== components/rm-booking.jsx =====
+// RM Booking deep flow — specialization → RM list → RM detail → meeting type → date/time → confirm → live status
+function RMBookingFlow({ persona, onBack, onHome, initialStep=0 }) {
+  const [step, setStep] = React.useState(initialStep);
+  const [spec, setSpec] = React.useState('esg');
+  const [rm, setRm] = React.useState(null);
+  const [meetingType, setMeetingType] = React.useState('lounge');
+  const [date, setDate] = React.useState('18');
+  const [time, setTime] = React.useState('15:20');
+  const [purpose, setPurpose] = React.useState('ESG-linked financing discussion');
+
+  const next = () => setStep(s => s+1);
+  const prev = () => step===0 ? onBack() : setStep(s => s-1);
+
+  return (
+    <div style={{height:'100%', background:TOKENS.ivory, display:'flex', flexDirection:'column', fontFamily:TOKENS.sans}}>
+      <RMHeader step={step} onBack={prev} onHome={onHome}/>
+      <div style={{flex:1, overflow:'auto'}}>
+        {step===0 && <Step0_Spec spec={spec} setSpec={setSpec} persona={persona} onNext={next}/>}
+        {step===1 && <Step1_RMs spec={spec} onPick={(r)=>{setRm(r); next();}} />}
+        {step===2 && rm && <Step2_RMDetail rm={rm} onNext={next}/>}
+        {step===3 && <Step3_Type meetingType={meetingType} setMeetingType={setMeetingType} onNext={next}/>}
+        {step===4 && <Step4_When date={date} setDate={setDate} time={time} setTime={setTime} purpose={purpose} setPurpose={setPurpose} onNext={next}/>}
+        {step===5 && rm && <Step5_Confirm persona={persona} rm={rm} meetingType={meetingType} date={date} time={time} purpose={purpose} onConfirm={next}/>}
+        {step===6 && rm && <Step6_LiveStatus rm={rm} meetingType={meetingType} time={time} onHome={onHome}/>}
+      </div>
+    </div>
+  );
+}
+
+function RMHeader({ step, onBack, onHome }) {
+  const total = 6;
+  const steps = ['Focus', 'Specialist', 'Profile', 'Format', 'When', 'Confirm', 'Booked'];
+  return (
+    <div style={{
+      background: TOKENS.navyDeep, color: TOKENS.ivory, padding:'56px 18px 14px',
+    }}>
+      <div style={{display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:14}}>
+        <button onClick={onBack} style={{background:'none', border:'none', color:TOKENS.ivory, display:'flex', alignItems:'center', gap:6, cursor:'pointer', padding:'4px 8px', marginLeft:-8, fontFamily:TOKENS.sans, fontSize:13}}>
+          {Icon.chevronL(TOKENS.ivory, 16)} Back
+        </button>
+        <div style={{fontFamily:TOKENS.serif, fontSize:14, letterSpacing:1.5}}>
+          RM Booking
+        </div>
+        <button onClick={onHome} style={{background:'none', border:'none', color:'rgba(247,243,236,0.5)', cursor:'pointer', fontSize:11, letterSpacing:1.2, textTransform:'uppercase', fontFamily:TOKENS.sans}}>
+          Close
+        </button>
+      </div>
+      {/* progress segments */}
+      <div style={{display:'flex', gap:4, marginTop:4}}>
+        {[...Array(total)].map((_,i) => (
+          <div key={i} style={{
+            flex:1, height:2, borderRadius:2,
+            background: i <= step ? TOKENS.gold : 'rgba(247,243,236,0.15)',
+            transition:'background 0.3s',
+          }}/>
+        ))}
+      </div>
+      <div style={{marginTop:8, fontSize:10, letterSpacing:2, color:TOKENS.gold, textTransform:'uppercase'}}>
+        Step {Math.min(step+1,total)} of {total} · {steps[step]}
+      </div>
+    </div>
+  );
+}
+
+// -- Step 0: Specialization --
+function Step0_Spec({ spec, setSpec, persona, onNext }) {
+  return (
+    <div style={{padding:'22px 20px 24px'}}>
+      <div style={{fontSize:10, letterSpacing:2, color:TOKENS.goldDim, textTransform:'uppercase'}}>For {persona.name.split(' ')[0]}</div>
+      <div style={{fontFamily:TOKENS.serif, fontSize:28, lineHeight:1.15, marginTop:6, color:TOKENS.navy, letterSpacing:0.2}}>
+        What would you like<br/>
+        <span style={{fontStyle:'italic', color:TOKENS.goldDim}}>to discuss?</span>
+      </div>
+      <div style={{fontSize:12, color:TOKENS.inkMuted, marginTop:10, lineHeight:1.6}}>
+        Choose a focus area. We'll match you with the right specialist.
+      </div>
+
+      <div style={{marginTop:22, display:'grid', gridTemplateColumns:'1fr 1fr', gap:10}}>
+        {SPECIALIZATIONS.map(s => (
+          <button key={s.id}
+            onClick={()=>setSpec(s.id)}
+            style={{
+              textAlign:'left', padding:'16px 14px',
+              border: `1px solid ${spec===s.id ? TOKENS.gold : TOKENS.line}`,
+              background: spec===s.id ? 'rgba(201,165,92,0.08)' : TOKENS.surface,
+              borderRadius: 12, cursor:'pointer',
+              fontFamily: TOKENS.sans,
+              transition:'all 0.15s',
+            }}>
+            <div style={{fontSize:22, color:spec===s.id ? TOKENS.gold : TOKENS.goldDim, marginBottom:8}}>{s.icon}</div>
+            <div style={{fontSize:13, fontWeight:500, color:TOKENS.navy}}>{s.label}</div>
+            <div style={{fontSize:10.5, color:TOKENS.inkMuted, marginTop:4, lineHeight:1.4}}>{s.desc}</div>
+          </button>
+        ))}
+      </div>
+
+      <div style={{marginTop:26, padding:16, background:'rgba(11,27,43,0.03)', border:`1px solid ${TOKENS.line}`, borderRadius:12}}>
+        <div style={{fontSize:10, letterSpacing:1.5, color:TOKENS.goldDim, textTransform:'uppercase'}}>Suggested for your profile</div>
+        <div style={{display:'flex', gap:6, marginTop:8, flexWrap:'wrap'}}>
+          {persona.interests.map(i => <Pill key={i} tone="gold">{i}</Pill>)}
+        </div>
+      </div>
+
+      <div style={{marginTop:24}}>
+        <Button variant="primary" full onClick={onNext}>Continue</Button>
+      </div>
+    </div>
+  );
+}
+
+// -- Step 1: RM list --
+function Step1_RMs({ spec, onPick }) {
+  const filtered = RMS.filter(r => r.specs.includes(spec)).concat(RMS.filter(r => !r.specs.includes(spec)));
+  const specLabel = SPECIALIZATIONS.find(s=>s.id===spec)?.label;
+  return (
+    <div style={{padding:'22px 20px 24px'}}>
+      <div style={{fontSize:10, letterSpacing:2, color:TOKENS.goldDim, textTransform:'uppercase'}}>{specLabel}</div>
+      <div style={{fontFamily:TOKENS.serif, fontSize:26, lineHeight:1.15, marginTop:6, color:TOKENS.navy}}>
+        Specialists <span style={{fontStyle:'italic', color:TOKENS.goldDim}}>available</span>
+      </div>
+      <div style={{fontSize:12, color:TOKENS.inkMuted, marginTop:8}}>{filtered.length} relationship managers · sorted by match quality</div>
+
+      <div style={{marginTop:18, display:'flex', flexDirection:'column', gap:10}}>
+        {filtered.map((r, idx) => {
+          const matches = r.specs.includes(spec);
+          return (
+            <Card key={r.id} padding={16} onClick={()=>onPick(r)} style={{border:`1px solid ${matches?TOKENS.lineGold:TOKENS.line}`}}>
+              <div style={{display:'flex', gap:14, alignItems:'flex-start'}}>
+                <Avatar name={r.name} size={52} tone={idx%2===0?'navy':'gold'}/>
+                <div style={{flex:1, minWidth:0}}>
+                  <div style={{display:'flex', alignItems:'center', justifyContent:'space-between', gap:8}}>
+                    <div style={{fontSize:15, fontWeight:500, color:TOKENS.navy, fontFamily:TOKENS.serif, letterSpacing:0.2}}>{r.name}</div>
+                    {matches && <Pill tone="gold">★ Best match</Pill>}
+                  </div>
+                  <div style={{fontSize:11.5, color:TOKENS.inkMuted, marginTop:3, lineHeight:1.4}}>{r.title}</div>
+                  <div style={{display:'flex', gap:14, marginTop:10, fontSize:10.5, color:TOKENS.navy, fontFamily:TOKENS.mono}}>
+                    <span>{r.portfolio}</span>
+                    <span style={{color:TOKENS.line}}>|</span>
+                    <span>{r.years} yrs</span>
+                    <span style={{color:TOKENS.line}}>|</span>
+                    <span style={{color:TOKENS.gold}}>★ {r.rating}</span>
+                  </div>
+                  <div style={{marginTop:10, paddingTop:10, borderTop:`1px dashed ${TOKENS.line}`, display:'flex', alignItems:'center', justifyContent:'space-between'}}>
+                    <div style={{fontSize:10.5, color:TOKENS.goldDim, letterSpacing:0.8}}>
+                      Next: <span style={{color:TOKENS.navy, fontFamily:TOKENS.mono}}>{r.nextSlot}</span>
+                    </div>
+                    {Icon.chevronR(TOKENS.goldDim)}
+                  </div>
+                </div>
+              </div>
+            </Card>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+// -- Step 2: RM detail --
+function Step2_RMDetail({ rm, onNext }) {
+  return (
+    <div>
+      <div style={{
+        background: TOKENS.navy, color: TOKENS.ivory, padding:'28px 20px 28px',
+        backgroundImage:`radial-gradient(ellipse at top right, rgba(201,165,92,0.15) 0%, transparent 60%)`,
+      }}>
+        <div style={{display:'flex', gap:16, alignItems:'center'}}>
+          <Avatar name={rm.name} size={64} tone="gold"/>
+          <div style={{flex:1}}>
+            <div style={{fontFamily:TOKENS.serif, fontSize:22, letterSpacing:0.2}}>{rm.name}</div>
+            <div style={{fontSize:11.5, color:'rgba(247,243,236,0.65)', marginTop:4, lineHeight:1.4}}>{rm.title}</div>
+          </div>
+        </div>
+
+        <div style={{marginTop:20, padding:'14px 0', borderTop:`1px solid rgba(201,165,92,0.25)`, borderBottom:`1px solid rgba(201,165,92,0.25)`, display:'grid', gridTemplateColumns:'1fr 1fr 1fr', gap:8}}>
+          <div>
+            <div style={{fontSize:9, letterSpacing:1.5, color:'rgba(247,243,236,0.45)', textTransform:'uppercase'}}>Portfolio</div>
+            <div style={{fontFamily:TOKENS.mono, fontSize:13, color:TOKENS.goldSoft, marginTop:4}}>{rm.portfolio}</div>
+          </div>
+          <div>
+            <div style={{fontSize:9, letterSpacing:1.5, color:'rgba(247,243,236,0.45)', textTransform:'uppercase'}}>Experience</div>
+            <div style={{fontFamily:TOKENS.mono, fontSize:13, color:TOKENS.goldSoft, marginTop:4}}>{rm.years} yrs</div>
+          </div>
+          <div>
+            <div style={{fontSize:9, letterSpacing:1.5, color:'rgba(247,243,236,0.45)', textTransform:'uppercase'}}>Rating</div>
+            <div style={{fontFamily:TOKENS.mono, fontSize:13, color:TOKENS.goldSoft, marginTop:4}}>★ {rm.rating} · {rm.reviews}</div>
+          </div>
+        </div>
+      </div>
+
+      <div style={{padding:'22px 20px 24px'}}>
+        <div style={{fontSize:10, letterSpacing:2, color:TOKENS.goldDim, textTransform:'uppercase'}}>About</div>
+        <div style={{fontFamily:TOKENS.serif, fontSize:16, lineHeight:1.55, marginTop:8, color:TOKENS.navy, fontStyle:'italic'}}>
+          "{rm.bio}"
+        </div>
+
+        <div style={{marginTop:22, display:'flex', flexDirection:'column', gap:12}}>
+          <div>
+            <div style={{fontSize:10, letterSpacing:1.5, color:TOKENS.inkMuted, textTransform:'uppercase'}}>Specializations</div>
+            <div style={{display:'flex', flexWrap:'wrap', gap:6, marginTop:8}}>
+              {rm.specs.map(s => (
+                <Pill key={s} tone="gold">{SPECIALIZATIONS.find(x=>x.id===s)?.label}</Pill>
+              ))}
+            </div>
+          </div>
+          <div>
+            <div style={{fontSize:10, letterSpacing:1.5, color:TOKENS.inkMuted, textTransform:'uppercase'}}>Languages</div>
+            <div style={{display:'flex', flexWrap:'wrap', gap:6, marginTop:8}}>
+              {rm.languages.map(l => <Pill key={l} tone="navy">{l}</Pill>)}
+            </div>
+          </div>
+          <div>
+            <div style={{fontSize:10, letterSpacing:1.5, color:TOKENS.inkMuted, textTransform:'uppercase'}}>Based at</div>
+            <div style={{fontSize:13, color:TOKENS.navy, marginTop:6, display:'flex', alignItems:'center', gap:6}}>
+              {Icon.pin(TOKENS.goldDim)} {rm.location}
+            </div>
+          </div>
+        </div>
+
+        <div style={{marginTop:26, padding:16, background:TOKENS.parchment, borderRadius:12, display:'flex', alignItems:'center', gap:12}}>
+          {Icon.spark(TOKENS.gold)}
+          <div style={{flex:1, fontSize:11.5, color:TOKENS.navy, lineHeight:1.5}}>
+            <b style={{fontWeight:600}}>{rm.name.split(' ')[0]}</b> is available today. Average response: under 3 minutes.
+          </div>
+        </div>
+
+        <div style={{marginTop:22}}>
+          <Button variant="primary" full onClick={onNext}>Book a meeting with {rm.name.split(' ')[0]} →</Button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// -- Step 3: Meeting type --
+function Step3_Type({ meetingType, setMeetingType, onNext }) {
+  return (
+    <div style={{padding:'22px 20px 24px'}}>
+      <div style={{fontSize:10, letterSpacing:2, color:TOKENS.goldDim, textTransform:'uppercase'}}>Meeting format</div>
+      <div style={{fontFamily:TOKENS.serif, fontSize:26, lineHeight:1.15, marginTop:6, color:TOKENS.navy}}>
+        How would you like<br/>
+        <span style={{fontStyle:'italic', color:TOKENS.goldDim}}>to meet?</span>
+      </div>
+
+      <div style={{marginTop:22, display:'flex', flexDirection:'column', gap:10}}>
+        {MEETING_TYPES.map(m => {
+          const active = meetingType===m.id;
+          const iconFor = { lounge: Icon.lounge, video: Icon.video, branch: Icon.pin }[m.id];
+          return (
+            <button key={m.id} onClick={()=>setMeetingType(m.id)}
+              style={{
+                textAlign:'left', padding:18,
+                border:`1px solid ${active?TOKENS.gold:TOKENS.line}`,
+                background: active ? 'rgba(201,165,92,0.06)' : TOKENS.surface,
+                borderRadius:14, cursor:'pointer',
+                display:'flex', gap:14, alignItems:'flex-start',
+                fontFamily:TOKENS.sans,
+              }}>
+              <div style={{
+                width:44, height:44, borderRadius:10,
+                background: active ? TOKENS.navy : TOKENS.parchment,
+                display:'flex', alignItems:'center', justifyContent:'center',
+                flexShrink:0,
+              }}>{iconFor(active?TOKENS.gold:TOKENS.navy)}</div>
+              <div style={{flex:1}}>
+                <div style={{display:'flex', alignItems:'center', justifyContent:'space-between'}}>
+                  <div style={{fontSize:15, fontWeight:500, color:TOKENS.navy, fontFamily:TOKENS.serif}}>{m.label}</div>
+                  <div style={{fontSize:10, fontFamily:TOKENS.mono, color:TOKENS.goldDim}}>{m.duration}</div>
+                </div>
+                <div style={{fontSize:12, color:TOKENS.inkMuted, marginTop:5, lineHeight:1.5}}>{m.desc}</div>
+                <div style={{fontSize:10.5, color:TOKENS.goldDim, marginTop:8, fontStyle:'italic', fontFamily:TOKENS.serif}}>{m.note}</div>
+              </div>
+              <div style={{
+                width:18, height:18, borderRadius:18, border:`1.5px solid ${active?TOKENS.gold:TOKENS.line}`,
+                display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, marginTop:4,
+              }}>{active && <div style={{width:8, height:8, borderRadius:8, background:TOKENS.gold}}/>}</div>
+            </button>
+          );
+        })}
+      </div>
+
+      <div style={{marginTop:26}}>
+        <Button variant="primary" full onClick={onNext}>Continue</Button>
+      </div>
+    </div>
+  );
+}
+
+// -- Step 4: Date/time --
+function Step4_When({ date, setDate, time, setTime, purpose, setPurpose, onNext }) {
+  return (
+    <div style={{padding:'22px 20px 24px'}}>
+      <div style={{fontSize:10, letterSpacing:2, color:TOKENS.goldDim, textTransform:'uppercase'}}>Schedule</div>
+      <div style={{fontFamily:TOKENS.serif, fontSize:26, lineHeight:1.15, marginTop:6, color:TOKENS.navy}}>
+        Pick a <span style={{fontStyle:'italic', color:TOKENS.goldDim}}>time</span>
+      </div>
+
+      {/* date strip */}
+      <div style={{marginTop:22, display:'flex', gap:8, overflowX:'auto', paddingBottom:4, marginLeft:-20, paddingLeft:20, marginRight:-20, paddingRight:20}}>
+        {DATES.map(d => {
+          const active = date===d.d;
+          return (
+            <button key={d.d} onClick={()=>setDate(d.d)}
+              style={{
+                flexShrink:0, width:64, padding:'12px 0',
+                border:`1px solid ${active?TOKENS.gold:TOKENS.line}`,
+                background: active ? TOKENS.navy : TOKENS.surface,
+                color: active ? TOKENS.ivory : TOKENS.navy,
+                borderRadius:12, cursor:'pointer', fontFamily:TOKENS.sans,
+                textAlign:'center',
+              }}>
+              <div style={{fontSize:9, letterSpacing:1.5, textTransform:'uppercase', color: active?TOKENS.goldSoft:TOKENS.inkMuted}}>{d.dow}</div>
+              <div style={{fontFamily:TOKENS.serif, fontSize:22, marginTop:4, letterSpacing:0.2}}>{d.d}</div>
+              <div style={{fontSize:9, color: active?TOKENS.goldSoft:TOKENS.inkMuted, marginTop:3}}>{d.avail} slots</div>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* time slots */}
+      <div style={{marginTop:24}}>
+        <div style={{fontSize:10, letterSpacing:1.5, color:TOKENS.inkMuted, textTransform:'uppercase', marginBottom:10}}>Available today</div>
+        <div style={{display:'grid', gridTemplateColumns:'1fr 1fr 1fr', gap:8}}>
+          {TIME_SLOTS.map(s => {
+            const active = time===s.time && s.available;
+            return (
+              <button key={s.time}
+                disabled={!s.available}
+                onClick={()=>s.available && setTime(s.time)}
+                style={{
+                  padding:'12px 4px',
+                  border:`1px solid ${active?TOKENS.gold:TOKENS.line}`,
+                  background: !s.available ? 'rgba(11,27,43,0.03)' : (active?'rgba(201,165,92,0.1)':TOKENS.surface),
+                  color: !s.available ? TOKENS.inkMuted : TOKENS.navy,
+                  borderRadius:10, cursor: s.available?'pointer':'not-allowed',
+                  fontFamily: TOKENS.sans,
+                  opacity: s.available ? 1 : 0.5,
+                }}>
+                <div style={{fontFamily:TOKENS.mono, fontSize:14, fontWeight:500}}>{s.time}</div>
+                <div style={{fontSize:9, marginTop:3, letterSpacing:0.5, color: active?TOKENS.goldDim:TOKENS.inkMuted}}>{s.type}</div>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* purpose note */}
+      <div style={{marginTop:24}}>
+        <div style={{fontSize:10, letterSpacing:1.5, color:TOKENS.inkMuted, textTransform:'uppercase', marginBottom:8}}>What to discuss</div>
+        <textarea
+          value={purpose}
+          onChange={e=>setPurpose(e.target.value)}
+          rows={3}
+          style={{
+            width:'100%', padding:'12px 14px', borderRadius:12,
+            border:`1px solid ${TOKENS.line}`, background:TOKENS.surface,
+            fontFamily: TOKENS.sans, fontSize:13, color:TOKENS.navy,
+            resize:'none', boxSizing:'border-box', outline:'none',
+          }}/>
+        <div style={{fontSize:10, color:TOKENS.inkMuted, marginTop:6, fontStyle:'italic'}}>Your RM will prepare briefing materials in advance.</div>
+      </div>
+
+      <div style={{marginTop:26}}>
+        <Button variant="primary" full onClick={onNext}>Review booking</Button>
+      </div>
+    </div>
+  );
+}
+
+// -- Step 5: Confirm --
+function Step5_Confirm({ persona, rm, meetingType, date, time, purpose, onConfirm }) {
+  const mt = MEETING_TYPES.find(m=>m.id===meetingType);
+  const dt = DATES.find(d=>d.d===date);
+  return (
+    <div style={{padding:'22px 20px 24px'}}>
+      <div style={{fontSize:10, letterSpacing:2, color:TOKENS.goldDim, textTransform:'uppercase'}}>Review</div>
+      <div style={{fontFamily:TOKENS.serif, fontSize:26, lineHeight:1.15, marginTop:6, color:TOKENS.navy}}>
+        Confirm your <span style={{fontStyle:'italic', color:TOKENS.goldDim}}>meeting</span>
+      </div>
+
+      <div style={{marginTop:22, background:TOKENS.surface, border:`1px solid ${TOKENS.lineGold}`, borderRadius:16, overflow:'hidden'}}>
+        <div style={{padding:'18px 18px 14px', background:`linear-gradient(to bottom, rgba(201,165,92,0.06), transparent)`}}>
+          <div style={{display:'flex', gap:12, alignItems:'center'}}>
+            <Avatar name={rm.name} size={46} tone="gold"/>
+            <div style={{flex:1}}>
+              <div style={{fontFamily:TOKENS.serif, fontSize:16, color:TOKENS.navy}}>{rm.name}</div>
+              <div style={{fontSize:11, color:TOKENS.inkMuted, marginTop:2}}>{rm.title}</div>
+            </div>
+          </div>
+        </div>
+        <div style={{padding:'6px 18px 18px'}}>
+          {[
+            ['When', `${dt.day} · ${time}`, Icon.calendar],
+            ['Format', mt.label, { lounge:Icon.lounge, video:Icon.video, branch:Icon.pin }[meetingType]],
+            ['Duration', mt.duration, Icon.clock],
+            ['Location', mt.id==='lounge' ? 'SSKIA SmartLounge · Lounge A' : mt.id==='video' ? 'Private booth 3' : rm.location, Icon.pin],
+          ].map(([k,v,ic], i) => (
+            <div key={k} style={{
+              display:'flex', alignItems:'center', gap:12, padding:'12px 0',
+              borderTop: i===0 ? 'none' : `1px solid ${TOKENS.line}`,
+            }}>
+              <div style={{width:28, display:'flex', justifyContent:'center'}}>{ic(TOKENS.goldDim)}</div>
+              <div style={{flex:1}}>
+                <div style={{fontSize:10, letterSpacing:1.2, color:TOKENS.inkMuted, textTransform:'uppercase'}}>{k}</div>
+                <div style={{fontSize:13, color:TOKENS.navy, marginTop:3, fontFamily: k==='When' ? TOKENS.mono : TOKENS.sans}}>{v}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div style={{padding:'14px 18px', background:TOKENS.parchment, borderTop:`1px solid ${TOKENS.lineGold}`}}>
+          <div style={{fontSize:10, letterSpacing:1.2, color:TOKENS.inkMuted, textTransform:'uppercase', marginBottom:6}}>Agenda</div>
+          <div style={{fontSize:12.5, color:TOKENS.navy, lineHeight:1.5, fontStyle:'italic', fontFamily:TOKENS.serif}}>"{purpose}"</div>
+        </div>
+      </div>
+
+      <div style={{marginTop:18, display:'flex', alignItems:'flex-start', gap:10, fontSize:11, color:TOKENS.inkMuted, lineHeight:1.5}}>
+        <div style={{width:4, height:4, borderRadius:4, background:TOKENS.gold, marginTop:6, flexShrink:0}}/>
+        <div>By confirming, you consent to a private briefing note being prepared and shared with {rm.name.split(' ')[0]} under SSKIA's banking-partner protocol.</div>
+      </div>
+
+      <div style={{marginTop:22, display:'flex', flexDirection:'column', gap:10}}>
+        <Button variant="gold" full onClick={onConfirm}>Confirm booking</Button>
+        <Button variant="ghost" full>Add co-attendee</Button>
+      </div>
+    </div>
+  );
+}
+
+// -- Step 6: Live status --
+function Step6_LiveStatus({ rm, meetingType, time, onHome }) {
+  const [eta, setEta] = React.useState(7);
+  React.useEffect(()=>{
+    const id = setInterval(()=>setEta(e => e<=1 ? 7 : e-1), 2500);
+    return () => clearInterval(id);
+  },[]);
+
+  return (
+    <div style={{height:'100%', background:TOKENS.navyDeep, color:TOKENS.ivory, display:'flex', flexDirection:'column', padding:'22px 22px 24px',
+      backgroundImage:`radial-gradient(ellipse at top, rgba(201,165,92,0.18) 0%, transparent 55%)`,
+    }}>
+      <div style={{textAlign:'center', marginTop:20}}>
+        <div style={{
+          width:82, height:82, borderRadius:82, margin:'0 auto',
+          background:'rgba(201,165,92,0.12)', border:`1px solid ${TOKENS.gold}`,
+          display:'flex', alignItems:'center', justifyContent:'center',
+        }}>
+          {Icon.check(TOKENS.gold, 38)}
+        </div>
+        <div style={{fontSize:10, letterSpacing:2, color:TOKENS.gold, textTransform:'uppercase', marginTop:18}}>Confirmed</div>
+        <div style={{fontFamily:TOKENS.serif, fontSize:28, lineHeight:1.15, marginTop:8, letterSpacing:0.2}}>
+          Your meeting is<br/>
+          <span style={{fontStyle:'italic', color:TOKENS.goldSoft}}>confirmed</span>
+        </div>
+      </div>
+
+      <div style={{marginTop:26, padding:'18px 18px', borderRadius:14, background:'rgba(201,165,92,0.08)', border:`1px solid ${TOKENS.lineGold}`}}>
+        <div style={{display:'flex', gap:12, alignItems:'center'}}>
+          <div style={{position:'relative'}}>
+            <Avatar name={rm.name} size={48} tone="gold"/>
+            <div style={{position:'absolute', bottom:-2, right:-2, width:14, height:14, borderRadius:14, background:'#4ade80', border:`2px solid ${TOKENS.navyDeep}`}}/>
+          </div>
+          <div style={{flex:1}}>
+            <div style={{fontFamily:TOKENS.serif, fontSize:15}}>{rm.name}</div>
+            <div style={{fontSize:11, color:'rgba(247,243,236,0.6)', marginTop:2, display:'flex', alignItems:'center', gap:6}}>
+              <Icon.dot c="#4ade80"/> En route to lounge
+            </div>
+          </div>
+          <Pill tone="live"><Icon.dot c="#7FD8AE"/> Live</Pill>
+        </div>
+
+        <div style={{marginTop:16, display:'grid', gridTemplateColumns:'1fr 1fr', gap:10}}>
+          <div style={{padding:'10px 12px', background:'rgba(11,27,43,0.5)', borderRadius:8}}>
+            <div style={{fontSize:9, letterSpacing:1.5, color:'rgba(247,243,236,0.5)', textTransform:'uppercase'}}>ETA</div>
+            <div style={{fontFamily:TOKENS.mono, fontSize:15, color:TOKENS.goldSoft, marginTop:3}}>{eta} min</div>
+          </div>
+          <div style={{padding:'10px 12px', background:'rgba(11,27,43,0.5)', borderRadius:8}}>
+            <div style={{fontSize:9, letterSpacing:1.5, color:'rgba(247,243,236,0.5)', textTransform:'uppercase'}}>At</div>
+            <div style={{fontFamily:TOKENS.mono, fontSize:15, color:TOKENS.goldSoft, marginTop:3}}>{time}</div>
+          </div>
+        </div>
+      </div>
+
+      {/* Map-like placeholder */}
+      <div style={{marginTop:14, height:120, borderRadius:12, border:`1px solid ${TOKENS.lineGold}`, background: `
+        repeating-linear-gradient(90deg, rgba(201,165,92,0.06) 0, rgba(201,165,92,0.06) 1px, transparent 1px, transparent 24px),
+        repeating-linear-gradient(0deg, rgba(201,165,92,0.06) 0, rgba(201,165,92,0.06) 1px, transparent 1px, transparent 24px),
+        ${TOKENS.navy}
+      `, position:'relative', overflow:'hidden'}}>
+        <svg viewBox="0 0 280 120" width="100%" height="100%" style={{position:'absolute', inset:0}}>
+          <path d="M20 100 Q 90 60 140 70 T 260 30" fill="none" stroke={TOKENS.gold} strokeWidth="1.5" strokeDasharray="3 3"/>
+          <circle cx="20" cy="100" r="5" fill={TOKENS.gold}/>
+          <circle cx="260" cy="30" r="6" fill={TOKENS.goldSoft}>
+            <animate attributeName="r" values="6;9;6" dur="1.8s" repeatCount="indefinite"/>
+          </circle>
+        </svg>
+        <div style={{position:'absolute', bottom:8, left:12, fontFamily:TOKENS.mono, fontSize:9, letterSpacing:1, color:TOKENS.goldSoft}}>RM TRAJECTORY · LOUNGE A</div>
+      </div>
+
+      <div style={{flex:1}}/>
+
+      <div style={{display:'flex', flexDirection:'column', gap:10, marginTop:20}}>
+        <Button variant="gold" full>Send message to {rm.name.split(' ')[0]}</Button>
+        <Button variant="outline" full onClick={onHome} style={{color:TOKENS.goldSoft, boxShadow:`inset 0 0 0 1px ${TOKENS.gold}`}}>Back to SmartLounge</Button>
+      </div>
+    </div>
+  );
+}
+
+window.RMBookingFlow = RMBookingFlow;
+
+
+// ===== components/secondary.jsx =====
+// Secondary screens: Lounge, Concierge, Insights, Account, Bookings
+function GenericHeader({ eyebrow, title, italicTail, onBack, onHome }) {
+  return (
+    <div style={{
+      background: TOKENS.navyDeep, color: TOKENS.ivory,
+      padding:'56px 20px 26px',
+      backgroundImage:`radial-gradient(ellipse at top right, rgba(201,165,92,0.12) 0%, transparent 55%)`,
+    }}>
+      <div style={{display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:16}}>
+        <button onClick={onBack} style={{background:'none', border:'none', color:TOKENS.ivory, display:'flex', alignItems:'center', gap:6, cursor:'pointer', padding:'4px 8px', marginLeft:-8, fontFamily:TOKENS.sans, fontSize:13}}>
+          {Icon.chevronL(TOKENS.ivory, 16)} Back
+        </button>
+        <PartnerMark variant="light"/>
+      </div>
+      <div style={{fontSize:10, letterSpacing:2, color:TOKENS.gold, textTransform:'uppercase'}}>{eyebrow}</div>
+      <div style={{fontFamily:TOKENS.serif, fontSize:30, lineHeight:1.15, marginTop:6, letterSpacing:0.2}}>
+        {title} {italicTail && <span style={{fontStyle:'italic', color:TOKENS.goldSoft}}>{italicTail}</span>}
+      </div>
+    </div>
+  );
+}
+
+function LoungeScreen({ onBack, onHome }) {
+  const groups = [
+    { title:'Dining', items:[
+      {name:'Executive Chef\'s Menu', desc:'Beef fillet, Kalahari truffle', time:'In your seat · 18 min'},
+      {name:'Light Plates', desc:'Curated small plates & crudités', time:'5 min'},
+      {name:'Sommelier Selection', desc:'Bordeaux, Stellenbosch reserves', time:'3 min'},
+    ]},
+    { title:'Rest & Refresh', items:[
+      {name:'Private Shower Suite', desc:'Rain shower · dressing room', time:'Available now'},
+      {name:'Quiet Cabin', desc:'90-min rest pod', time:'2 available'},
+      {name:'Spa Treatment', desc:'30-min shoulder & neck', time:'Next 15:30'},
+    ]},
+    { title:'Workspace', items:[
+      {name:'Private Meeting Booth', desc:'4 seats · video-ready', time:'Booth 3 free'},
+      {name:'Focus Desk', desc:'Single desk · secure WiFi', time:'Available'},
+    ]},
+  ];
+  return (
+    <div style={{height:'100%', background:TOKENS.ivory, overflow:'auto'}}>
+      <GenericHeader eyebrow="Lounge A · Level 2" title="Amenities" italicTail="& service" onBack={onBack}/>
+      <div style={{padding:'22px 20px 32px'}}>
+        {groups.map((g,gi) => (
+          <div key={g.title} style={{marginBottom:22}}>
+            <div style={{fontSize:10, letterSpacing:2, color:TOKENS.goldDim, textTransform:'uppercase', marginBottom:10, display:'flex', alignItems:'center', gap:10}}>
+              {g.title}
+              <div style={{flex:1, height:1, background:TOKENS.line}}/>
+            </div>
+            <div style={{display:'flex', flexDirection:'column', gap:8}}>
+              {g.items.map(it => (
+                <Card key={it.name} padding={14} style={{display:'flex', alignItems:'center', gap:12}}>
+                  <ImagePlaceholder label={it.name.split(' ')[0]} height={48} tone="parchment" style={{width:48, flexShrink:0}}/>
+                  <div style={{flex:1}}>
+                    <div style={{fontSize:13, color:TOKENS.navy, fontFamily:TOKENS.serif, fontWeight:500}}>{it.name}</div>
+                    <div style={{fontSize:11, color:TOKENS.inkMuted, marginTop:3}}>{it.desc}</div>
+                  </div>
+                  <div style={{fontSize:10, color:TOKENS.goldDim, fontFamily:TOKENS.mono, textAlign:'right'}}>{it.time}</div>
+                </Card>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function ConciergeScreen({ onBack }) {
+  const services = [
+    { name:'Hotel', desc:'Capital, The President, Phakalane Estate', detail:'12 partners' },
+    { name:'Chauffeured Transfer', desc:'Private car to CBD or Phakalane', detail:'From 8 min' },
+    { name:'Translator', desc:'Setswana, French, Mandarin, Portuguese', detail:'On call' },
+    { name:'Helicopter Charter', desc:'Okavango · Chobe · mine sites', detail:'Scheduled' },
+    { name:'Gift & Flora', desc:'Arrivals bouquet, curated welcome', detail:'Same hour' },
+  ];
+  return (
+    <div style={{height:'100%', background:TOKENS.ivory, overflow:'auto'}}>
+      <GenericHeader eyebrow="Concierge" title="At your" italicTail="service" onBack={onBack}/>
+      <div style={{padding:'22px 20px 32px'}}>
+        <Card padding={16} style={{background:TOKENS.navy, color:TOKENS.ivory, border:'none', marginBottom:18}}>
+          <div style={{display:'flex', gap:12, alignItems:'center'}}>
+            <Avatar name="Mpho Tau" size={40} tone="gold"/>
+            <div style={{flex:1}}>
+              <div style={{fontSize:10, letterSpacing:1.5, color:TOKENS.goldSoft, textTransform:'uppercase'}}>Your concierge</div>
+              <div style={{fontFamily:TOKENS.serif, fontSize:15, marginTop:2}}>Mpho Tau</div>
+            </div>
+            <Button variant="goldOutline" size="sm" style={{boxShadow:`inset 0 0 0 1px ${TOKENS.gold}`}}>Chat</Button>
+          </div>
+        </Card>
+        <div style={{display:'flex', flexDirection:'column', gap:8}}>
+          {services.map(s => (
+            <Card key={s.name} padding={14} style={{display:'flex', alignItems:'center', gap:12}}>
+              <div style={{flex:1}}>
+                <div style={{fontSize:13, color:TOKENS.navy, fontFamily:TOKENS.serif, fontWeight:500}}>{s.name}</div>
+                <div style={{fontSize:11, color:TOKENS.inkMuted, marginTop:3}}>{s.desc}</div>
+              </div>
+              <div style={{fontSize:10, color:TOKENS.goldDim, fontFamily:TOKENS.mono, marginRight:4}}>{s.detail}</div>
+              {Icon.chevronR(TOKENS.inkMuted)}
+            </Card>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function InsightsScreen({ onBack }) {
+  const briefings = [
+    { tag:'ESG', title:'Okavango Green Bond: performance 18 months in', meta:'12 min read · Updated today' },
+    { tag:'MINING', title:'Diamond supply outlook — Jwaneng expansion impact', meta:'9 min read · Analyst call Thu' },
+    { tag:'MACRO', title:'Pula positioning: BoB rate path, Q2 2026', meta:'6 min brief · PDF' },
+    { tag:'TOURISM', title:'Luxury safari operators: consolidation trends', meta:'14 min read' },
+  ];
+  return (
+    <div style={{height:'100%', background:TOKENS.ivory, overflow:'auto'}}>
+      <GenericHeader eyebrow="Market briefings" title="Investor" italicTail="insights · Botswana" onBack={onBack}/>
+      <div style={{padding:'22px 20px 32px'}}>
+        <ImagePlaceholder label="Featured chart · Botswana GDP 2023–26" height={140} tone="navy" style={{marginBottom:18}}/>
+        <div style={{display:'flex', flexDirection:'column', gap:10}}>
+          {briefings.map(b => (
+            <Card key={b.title} padding={16}>
+              <Pill tone="gold">{b.tag}</Pill>
+              <div style={{fontFamily:TOKENS.serif, fontSize:15, lineHeight:1.35, color:TOKENS.navy, marginTop:10}}>{b.title}</div>
+              <div style={{fontSize:10.5, color:TOKENS.inkMuted, fontFamily:TOKENS.mono, marginTop:8, letterSpacing:0.5}}>{b.meta}</div>
+            </Card>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function AccountScreen({ onBack }) {
+  const [step, setStep] = React.useState(0);
+  const steps = ['Identity', 'Profile', 'Compliance', 'Fund'];
+  return (
+    <div style={{height:'100%', background:TOKENS.ivory, overflow:'auto'}}>
+      <GenericHeader eyebrow="Digital onboarding" title="Open an" italicTail="account" onBack={onBack}/>
+      <div style={{padding:'22px 20px 32px'}}>
+        <div style={{fontSize:12, color:TOKENS.inkMuted, lineHeight:1.6}}>
+          Complete a full premier account in under 8 minutes. Your SSKIA arrival record pre-fills identity verification.
+        </div>
+        <div style={{marginTop:18, display:'flex', gap:6}}>
+          {steps.map((s,i) => (
+            <div key={s} style={{flex:1}}>
+              <div style={{height:3, borderRadius:3, background: i<=step ? TOKENS.gold : TOKENS.line}}/>
+              <div style={{fontSize:10, color: i<=step ? TOKENS.navy : TOKENS.inkMuted, marginTop:6, letterSpacing:0.5}}>{s}</div>
+            </div>
+          ))}
+        </div>
+
+        <Card padding={18} style={{marginTop:22}}>
+          <div style={{fontSize:10, letterSpacing:2, color:TOKENS.goldDim, textTransform:'uppercase'}}>Step {step+1}</div>
+          <div style={{fontFamily:TOKENS.serif, fontSize:20, color:TOKENS.navy, marginTop:6}}>{
+            ['Verify your identity','Tell us about you','Compliance & source of funds','Initial funding'][step]
+          }</div>
+          <div style={{fontSize:12, color:TOKENS.inkMuted, marginTop:8, lineHeight:1.5}}>{
+            ['Your passport scan from arrivals is on file. One tap to verify.',
+             'Residency, tax number, employment. 90 seconds.',
+             'Declare source of funds and answer 4 KYC questions.',
+             'Transfer starting deposit or link an external account.'][step]
+          }</div>
+          <div style={{marginTop:16, height:70, borderRadius:10, background:TOKENS.parchment, border:`1px dashed ${TOKENS.lineGold}`, display:'flex', alignItems:'center', justifyContent:'center', fontFamily:TOKENS.mono, fontSize:10, letterSpacing:1, color:TOKENS.goldDim}}>
+            {['PASSPORT · VERIFIED','PROFILE FORM','KYC QUESTIONS','FUNDING'][step]}
+          </div>
+          <div style={{marginTop:16, display:'flex', gap:8}}>
+            {step>0 && <Button variant="outline" onClick={()=>setStep(s=>s-1)}>Back</Button>}
+            <Button variant="primary" style={{flex:1}} onClick={()=>setStep(s=>Math.min(3,s+1))}>
+              {step===3 ? 'Complete' : 'Continue'}
+            </Button>
+          </div>
+        </Card>
+      </div>
+    </div>
+  );
+}
+
+function BookingsScreen({ onBack, onOpenLive }) {
+  return (
+    <div style={{height:'100%', background:TOKENS.ivory, overflow:'auto'}}>
+      <GenericHeader eyebrow="My bookings" title="Upcoming &" italicTail="history" onBack={onBack}/>
+      <div style={{padding:'22px 20px 32px'}}>
+        <div style={{fontSize:10, letterSpacing:2, color:TOKENS.goldDim, textTransform:'uppercase', marginBottom:10}}>Today</div>
+        <Card padding={16} onClick={onOpenLive} style={{border:`1px solid ${TOKENS.gold}`, background:'rgba(201,165,92,0.05)'}}>
+          <div style={{display:'flex', gap:12, alignItems:'center'}}>
+            <Avatar name="Thato Molefe" size={44} tone="gold"/>
+            <div style={{flex:1}}>
+              <div style={{fontSize:14, color:TOKENS.navy, fontFamily:TOKENS.serif}}>Thato Molefe</div>
+              <div style={{fontSize:11, color:TOKENS.inkMuted, marginTop:2}}>ESG-linked financing discussion</div>
+              <div style={{fontSize:11, color:TOKENS.goldDim, fontFamily:TOKENS.mono, marginTop:6}}>Today · 15:20 · Lounge A</div>
+            </div>
+            <Pill tone="live"><Icon.dot c="#7FD8AE"/> Live</Pill>
+          </div>
+        </Card>
+
+        <div style={{fontSize:10, letterSpacing:2, color:TOKENS.goldDim, textTransform:'uppercase', marginTop:26, marginBottom:10}}>Previous</div>
+        <div style={{display:'flex', flexDirection:'column', gap:10}}>
+          {[
+            { rm:'Kgosi Ramotswe', topic:'Copper portfolio review', when:'Mar 12 · Airport Junction' },
+            { rm:'Dikeledi Phiri', topic:'Private banking onboarding', when:'Feb 4 · Video call' },
+          ].map(b => (
+            <Card key={b.when} padding={14} style={{display:'flex', gap:12, alignItems:'center'}}>
+              <Avatar name={b.rm} size={36} tone="navy"/>
+              <div style={{flex:1}}>
+                <div style={{fontSize:13, color:TOKENS.navy}}>{b.rm}</div>
+                <div style={{fontSize:11, color:TOKENS.inkMuted, marginTop:2}}>{b.topic}</div>
+              </div>
+              <div style={{fontSize:10, color:TOKENS.inkMuted, fontFamily:TOKENS.mono}}>{b.when}</div>
+            </Card>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+window.LoungeScreen = LoungeScreen;
+window.ConciergeScreen = ConciergeScreen;
+window.InsightsScreen = InsightsScreen;
+window.AccountScreen = AccountScreen;
+window.BookingsScreen = BookingsScreen;
+
